@@ -3,7 +3,7 @@
 import requests
 
 
-def recurse(subreddit, hot_list=[], after=None):
+def recurse(subreddit, hot_list=None, after=None):
     """
     Recursively query the Reddit API and return all hot article titles.
 
@@ -15,6 +15,9 @@ def recurse(subreddit, hot_list=[], after=None):
     Returns:
         List of all hot article titles, or None if subreddit is invalid
     """
+    if hot_list is None:
+        hot_list = []
+
     if not subreddit or not isinstance(subreddit, str):
         return None
 
@@ -35,8 +38,8 @@ def recurse(subreddit, hot_list=[], after=None):
         data = response.json()
         posts = data.get('data', {}).get('children', [])
 
-        if not posts:
-            return hot_list if hot_list else None
+        if not posts and not hot_list:
+            return None
 
         for post in posts:
             title = post.get('data', {}).get('title')
