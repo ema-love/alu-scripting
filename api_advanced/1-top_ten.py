@@ -11,7 +11,7 @@ def top_ten(subreddit):
         subreddit: name of the subreddit
     """
     if not subreddit or not isinstance(subreddit, str):
-        print(None)
+        print("None")
         return
 
     url = "https://www.reddit.com/r/{}/hot.json".format(subreddit)
@@ -26,11 +26,14 @@ def top_ten(subreddit):
             data = response.json()
             posts = data.get('data', {}).get('children', [])
 
-            for post in posts:
-                title = post.get('data', {}).get('title')
-                if title:
-                    print(title)
+            if posts:
+                for post in posts:
+                    title = post.get('data', {}).get('title')
+                    if title:
+                        print(title)
+            else:
+                print("None")
         else:
-            print(None)
+            print("None")
     except Exception:
-        print(None)
+        print("None")
