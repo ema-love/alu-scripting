@@ -10,30 +10,34 @@ def top_ten(subreddit):
     Args:
         subreddit: name of the subreddit
     """
-    if not subreddit or not isinstance(subreddit, str):
+    if subreddit is None or type(subreddit) is not str:
         print("None")
         return
 
     url = "https://www.reddit.com/r/{}/hot.json".format(subreddit)
-    headers = {'User-Agent': 'My-User-Agent/1.0'}
+    headers = {
+        'User-Agent': 'linux:0-subs:v1.0.0 (by /u/yourusername)'
+    }
     params = {'limit': 10}
 
     try:
         response = requests.get(url, headers=headers, params=params,
-                                allow_redirects=False, timeout=10)
+                                allow_redirects=False)
 
         if response.status_code == 200:
             data = response.json()
             children = data.get('data', {}).get('children', [])
 
-            if len(children) == 0:
+            if not children:
                 print("None")
-            else:
-                for child in children:
-                    title = child.get('data', {}).get('title')
-                    if title:
-                        print(title)
+                return
+
+            for child in children:
+                post_data = child.get('data', {})
+                title = post_data.get('title')
+                print(title)
         else:
             print("None")
-    except Exception:
+
+    except (requests.RequestException, ValueError, KeyError):
         print("None")
