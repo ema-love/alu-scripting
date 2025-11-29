@@ -1,34 +1,54 @@
 #!/usr/bin/python3
-"""
-Export employee TODO list data to a JSON file
-"""
-import json
+"""Module to recursively query Reddit API for all hot articles."""
 import requests
-import sys
 
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        sys.exit()
 
-    emp_id = sys.argv[1]
+def recurse(subreddit, hot_list=[], after=None):
+    """
+    Recursively query the Reddit API and return all hot article titles.
 
-    user = requests.get(f"https://jsonplaceholder.typicode.com/users/{emp_id}").json()
-    todos = requests.get(f"https://jsonplaceholder.typicode.com/users/{emp_id}/todos").json()
+    Args:
+        subreddit: name of the subreddit
+        hot_list: list to accumulate hot article titles
+        after: pagination token for next page
 
-    username = user.get("username")
+    Returns:
+        List of all hot article titles, or None if subreddit is invalid
+    """
+    if not subreddit or not isinstance(subreddit, str):
+        return None
 
-    data = {
-        emp_id: [
-            {
-                "task": t.get("title"),
-                "completed": t.get("completed"),
-                "username": username
-            }
-            for t in todos
-        ]
-    }
+    url = "https://www.reddit.com/r/{}/hot.json".format(subreddit)
+    headers = {'User-Agent': 'CustomBot/1.0'}
+    params = {'limit': 100}
 
-    filename = f"{emp_id}.json"
+    if after:
+        params['after'] = after
 
-    with open(filename, "w") as f:
-        json.dump(data, f)
+    try:
+        response = requests.get(url, headers=headers, params=params,
+                                allow_redirects=False)
+
+        if response.status_code != 200:
+            return None
+
+        data = response.json()
+        posts = data.get('data', {}).get('children', [])
+
+        if not posts:
+            return hot_list if hot_list else None
+
+        for post in posts:
+            title = post.get('data', {}).get('title')
+            if title:
+                hot_list.append(title)
+
+        after = data.get('data', {}).get('after')
+
+        if after:
+            return recurse(subreddit, hot_list, after)
+        else:
+            return hot_list if hot_list else None
+
+    except Exception:
+        return None
