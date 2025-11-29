@@ -1,35 +1,43 @@
 #!/usr/bin/python3
-"""Script to export employee TODO list to CSV format"""
-import csv
+"""
+Module to query Reddit API for top 10 hot posts
+"""
 import requests
-import sys
 
 
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        sys.exit(1)
+def top_ten(subreddit):
+    """
+    Queries the Reddit API and prints the titles of the first 10 hot posts
+    for a given subreddit.
     
-    employee_id = sys.argv[1]
-    base_url = "https://jsonplaceholder.typicode.com"
+    Args:
+        subreddit: name of the subreddit
+    """
+    if not subreddit or not isinstance(subreddit, str):
+        print("None")
+        return
     
-    # Get employee information
-    user_response = requests.get(f"{base_url}/users/{employee_id}")
-    user_data = user_response.json()
-    username = user_data.get("username")
+    url = f"https://www.reddit.com/r/{subreddit}/hot.json"
+    headers = {'User-Agent': 'CustomBot/1.0'}
+    params = {'limit': 10}
     
-    # Get employee's TODO list
-    todos_response = requests.get(f"{base_url}/todos?userId={employee_id}")
-    todos_data = todos_response.json()
-    
-    # Write to CSV file
-    filename = f"{employee_id}.csv"
-    with open(filename, mode='w', newline='') as csvfile:
-        writer = csv.writer(csvfile, quoting=csv.QUOTE_ALL)
+    try:
+        response = requests.get(url, headers=headers, params=params,
+                                allow_redirects=False)
         
-        for task in todos_data:
-            writer.writerow([
-                employee_id,
-                username,
-                str(task.get("completed")),
-                task.get("title")
-            ])
+        if response.status_code == 200:
+            data = response.json()
+            posts = data.get('data', {}).get('children', [])
+            
+            if not posts:
+                print("None")
+                return
+            
+            for post in posts:
+                title = post.get('data', {}).get('title')
+                if title:
+                    print(title)
+        else:
+            print("None")
+    except Exception:
+        print("None")
