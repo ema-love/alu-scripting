@@ -3,7 +3,9 @@
 import requests
 
 
-def recurse(subreddit, hot_list=[], after=None):
+def recurse(subreddit, hot_list=None, after=None):
+    if hot_list is None:
+        hot_list = []
     url = f"https://www.reddit.com/r/{subreddit}/hot.json?limit=100"
     if after:
         url += f"&after={after}"

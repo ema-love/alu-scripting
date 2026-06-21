@@ -3,8 +3,9 @@
 import requests
 
 
-def count_words(subreddit, word_list, counts={}, after=None):
-    if not counts:
+def count_words(subreddit, word_list, counts=None, after=None):
+    if counts is None:
+        counts = {}
         for word in word_list:
             counts[word.lower()] = counts.get(word.lower(), 0)
 
