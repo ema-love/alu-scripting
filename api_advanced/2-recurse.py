@@ -1,13 +1,16 @@
 #!/usr/bin/python3
-"""Recursively returns list of all hot article titles for a subreddit"""
+"""Recursively returns list of all hot article titles for a subreddit."""
 import requests
 
 
-def recurse(subreddit, hot_list=[], after=None):
-    url = f"https://www.reddit.com/r/{subreddit}/hot.json?limit=100"
+def recurse(subreddit, hot_list=None, after=None):
+    """Recursively query Reddit API and return all hot post titles."""
+    if hot_list is None:
+        hot_list = []
+    url = "https://www.reddit.com/r/{}/hot.json?limit=100".format(subreddit)
     if after:
-        url += f"&after={after}"
-    headers = {"User-Agent": "MyBot/1.0"}
+        url += "&after={}".format(after)
+    headers = {"User-Agent": "MyRedditBot/1.0 (by /u/ema_alx)"}
     response = requests.get(url, headers=headers, allow_redirects=False)
     if response.status_code != 200:
         return None
