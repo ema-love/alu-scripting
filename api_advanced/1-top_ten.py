@@ -1,11 +1,12 @@
 #!/usr/bin/python3
-"""Prints top 10 hot posts for a subreddit"""
+"""Prints the top 10 hot posts for a given subreddit."""
 import requests
 
 
 def top_ten(subreddit):
-    url = f"https://www.reddit.com/r/{subreddit}/hot.json?limit=10"
-    headers = {"User-Agent": "MyBot/1.0"}
+    """Print titles of the first 10 hot posts for a subreddit."""
+    url = "https://www.reddit.com/r/{}/hot.json?limit=10".format(subreddit)
+    headers = {"User-Agent": "MyRedditBot/1.0 (by /u/ema_alx)"}
     response = requests.get(url, headers=headers, allow_redirects=False)
     if response.status_code != 200:
         print(None)
