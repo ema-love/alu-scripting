@@ -5,12 +5,15 @@ import requests
 
 def top_ten(subreddit):
     """Print titles of the first 10 hot posts for a subreddit."""
-    url = "https://www.reddit.com/r/{}/hot.json?limit=10".format(subreddit)
-    headers = {"User-Agent": "MyRedditBot/1.0 (by /u/ema_alx)"}
-    response = requests.get(url, headers=headers, allow_redirects=False)
+    url = "https://www.reddit.com/r/{}/hot.json".format(subreddit)
+    headers = {"User-Agent": "python:top_ten:v1.0 (by /u/ema_alx)"}
+    params = {"limit": 10}
+    response = requests.get(
+        url, headers=headers, params=params, allow_redirects=False
+    )
     if response.status_code != 200:
         print(None)
         return
     posts = response.json().get("data", {}).get("children", [])
-    for post in posts:
+    for post in posts[:10]:
         print(post.get("data", {}).get("title"))
